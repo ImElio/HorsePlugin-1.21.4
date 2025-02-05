@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -45,23 +45,17 @@ public class HorseListener implements Listener {
         if (!(event.getRightClicked() instanceof Horse)) {
             return;
         }
-
         Player player = event.getPlayer();
         if (!player.isSneaking()) {
             return;
         }
-
         event.setCancelled(true);
-
         Horse horse = (Horse) event.getRightClicked();
-
         FileConfiguration config = HorseInfoPlugin.getInstance().getConfig();
         String guiTitle = config.getString("gui.title", "Info del Cavallo");
         int guiSize = config.getInt("gui.size", 9);
         int centerSlot = config.getInt("gui.center_slot", 4);
-
         Inventory gui = Bukkit.createInventory(null, guiSize, guiTitle);
-
         String materialStr = config.getString("item.material", "PAPER");
         Material material = Material.matchMaterial(materialStr);
         if (material == null) {
@@ -69,10 +63,8 @@ public class HorseListener implements Listener {
         }
         String itemDisplayName = config.getString("item.display_name", "Informazioni del Cavallo");
         List<String> loreConfig = config.getStringList("item.lore");
-
         String horseType = horse.getType().name();
         String horseName = (horse.getCustomName() != null) ? horse.getCustomName() : "N/D";
-
         String tamedDateStr = "N/D";
         PersistentDataContainer pdc = horse.getPersistentDataContainer();
         Long tamedTime = pdc.get(tamedTimeKey, PersistentDataType.LONG);
@@ -81,7 +73,6 @@ public class HorseListener implements Listener {
             Date date = new Date(tamedTime);
             tamedDateStr = df.format(date);
         }
-
         String horseSpeed = "N/D";
         try {
             Attribute movementSpeed = Attribute.valueOf("GENERIC_MOVEMENT_SPEED");
@@ -92,15 +83,12 @@ public class HorseListener implements Listener {
         } catch (IllegalArgumentException e) {
             horseSpeed = "N/A";
         }
-
         String horseJump = String.format("%.2f", horse.getJumpStrength());
-
         String horseHearts = "N/D";
         if (horse.getMaxHealth() > 0) {
             double hearts = horse.getMaxHealth() / 2.0;
             horseHearts = String.format("%.0f", hearts);
         }
-
         List<String> finalLore = new ArrayList<>();
         for (String line : loreConfig) {
             line = line.replace("%HORSE_TYPE%", horseType)
@@ -111,15 +99,19 @@ public class HorseListener implements Listener {
                     .replace("%HORSE_HEARTS%", horseHearts);
             finalLore.add(line);
         }
-
         ItemStack infoItem = new ItemStack(material);
         ItemMeta meta = infoItem.getItemMeta();
         meta.setDisplayName(itemDisplayName);
         meta.setLore(finalLore);
         infoItem.setItemMeta(meta);
-
         gui.setItem(centerSlot, infoItem);
-
         player.openInventory(gui);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (e.getView().getTitle().equals(HorseInfoPlugin.getInstance().getConfig().getString("gui.title", "Info del Cavallo"))) {
+            e.setCancelled(true);
+        }
     }
 }
