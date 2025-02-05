@@ -1,0 +1,15 @@
+gui:
+  title: "Info del Cavallo"
+  size: 9
+  center_slot: 4
+
+item:
+  material: PAPER
+  display_name: "Informazioni del Cavallo"
+  lore:
+    - "Tipo di cavallo: %HORSE_TYPE%"
+    - "Nome: %HORSE_NAME%"
+    - "Addomesticato: %TAMED_DATE%"
+    - "Velocità: %HORSE_SPEED%"
+    - "Salto: %HORSE_JUMP%"
+    - "Cuori: %HORSE_HEARTS%"

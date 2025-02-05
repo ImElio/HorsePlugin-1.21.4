@@ -1,0 +1,4 @@
+name: HorseInfoPlugin
+main: com.horseinfo.plugin.HorseInfoPlugin
+version: 1.0
+api-version: 1.21
