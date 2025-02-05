@@ -1,15 +1,71 @@
 gui:
-  title: "Info del Cavallo"
-  size: 9
-  center_slot: 4
+  title: "&9&lInfo del Cavallo | 1.1"
+  size: 27
 
-item:
-  material: PAPER
-  display_name: "Informazioni del Cavallo"
-  lore:
-    - "Tipo di cavallo: %HORSE_TYPE%"
-    - "Nome: %HORSE_NAME%"
-    - "Addomesticato: %TAMED_DATE%"
-    - "Velocità: %HORSE_SPEED%"
-    - "Salto: %HORSE_JUMP%"
-    - "Cuori: %HORSE_HEARTS%"
+items:
+  info:
+    slot: 13
+    material: PAPER
+    display_name: "&a&lTutte le informazioni"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&6✎ ɴᴏᴍᴇ: &e%HORSE_NAME%"
+      - "&6❤ ᴀᴅᴅᴏᴍᴇѕᴛɪᴄᴀᴛᴏ: &e%TAMED_DATE%"
+      - "&6💨 ᴠᴇʟᴏᴄɪᴛà: &e%HORSE_SPEED%"
+      - "&6🐎 ѕᴀʟᴛᴏ: &e%HORSE_JUMP%"
+      - "&6&l❤ ᴄᴜᴏʀɪ: &e%HORSE_HEARTS%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  type:
+    slot: 3
+    material: LEATHER_HORSE_ARMOR
+    display_name: "&6&l🐴 Tipo di Cavallo"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%HORSE_TYPE%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  name:
+    slot: 4
+    material: NAME_TAG
+    display_name: "&b&l✎ Nome"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%HORSE_NAME%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  date:
+    slot: 5
+    material: CLOCK
+    display_name: "&6&l🕒 Data Addomesticamento"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%TAMED_DATE%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  speed:
+    slot: 12
+    material: SUGAR
+    display_name: "&c&l💨 Velocità"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%HORSE_SPEED%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  jump:
+    slot: 14
+    material: RABBIT_FOOT
+    display_name: "&a&l🐎 Salto"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%HORSE_JUMP%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
+  hearts:
+    slot: 22
+    material: GOLDEN_APPLE
+    display_name: "&d&l❤ Cuori"
+    lore:
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+      - "&e%HORSE_HEARTS%"
+      - "&f&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"

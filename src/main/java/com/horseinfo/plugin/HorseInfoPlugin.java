@@ -11,12 +11,10 @@ public class HorseInfoPlugin extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new HorseListener(), this);
-        getLogger().info("HorseInfoPlugin abilitato!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("HorseInfoPlugin disabilitato!");
     }
 
     public static HorseInfoPlugin getInstance() {
