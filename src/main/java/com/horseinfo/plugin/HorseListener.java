@@ -34,7 +34,7 @@ public class HorseListener implements Listener {
     }
 
     private String formatDouble(double value) {
-        return String.format("%.2f", value).replace('.', ',');
+        return String.format("%.1f", value).replace('.', ',');
     }
 
     private double speedToMS(double attributeSpeed) {
@@ -66,7 +66,7 @@ public class HorseListener implements Listener {
         int guiSize = config.getInt("gui.size", 27);
         Inventory gui = Bukkit.createInventory(null, guiSize, ChatColor.translateAlternateColorCodes('&', guiTitle));
         String horseType = horse.getType().name();
-        String horseName = (horse.getCustomName() != null) ? horse.getCustomName() : "&4&lN/D";
+        String horseName = (horse.getCustomName() != null) ? horse.getCustomName() : "N/D";
         String tamedDateStr = "N/D";
         PersistentDataContainer pdc = horse.getPersistentDataContainer();
         Long tamedTime = pdc.get(tamedTimeKey, PersistentDataType.LONG);
@@ -83,13 +83,26 @@ public class HorseListener implements Listener {
             }
         } catch (IllegalArgumentException e) {}
         double speedMS = speedToMS(baseSpeed);
-        String horseSpeed = formatDouble(speedMS) + " m/s";
         double jumpHeight = jumpToHeight(horse.getJumpStrength());
-        String horseJump = formatDouble(jumpHeight) + " m";
         double heartsValue = horse.getMaxHealth() / 2.0;
+
+        // Normalizzazione delle statistiche
+        double minSpeed = 6.0, maxSpeed = 9.0;
+        double minJump = 1.0, maxJump = 2.0;
+        double minHearts = 7.5, maxHearts = 15.0;
+        double normSpeed = ((speedMS - minSpeed) / (maxSpeed - minSpeed)) * 100.0;
+        double normJump = ((jumpHeight - minJump) / (maxJump - minJump)) * 100.0;
+        double normHearts = ((heartsValue - minHearts) / (maxHearts - minHearts)) * 100.0;
+        if (normSpeed < 0) normSpeed = 0; if (normSpeed > 100) normSpeed = 100;
+        if (normJump < 0) normJump = 0; if (normJump > 100) normJump = 100;
+        if (normHearts < 0) normHearts = 0; if (normHearts > 100) normHearts = 100;
+        int overallPercentage = (int)Math.round((normSpeed + normJump + normHearts) / 3.0);
+
+        String horseSpeed = formatDouble(speedMS) + " m/s";
+        String horseJump = formatDouble(jumpHeight) + " m";
         String horseHearts = formatDouble(heartsValue) + " cuori";
-        double scoreValue = (speedMS * 10.0) + (jumpHeight * 10.0) + heartsValue;
-        String horseScore = formatDouble(scoreValue) + " punti";
+        String horseScore = overallPercentage + "%";
+
         ConfigurationSection itemsSection = config.getConfigurationSection("items");
         if (itemsSection == null) return;
         for (String key : itemsSection.getKeys(false)) {
