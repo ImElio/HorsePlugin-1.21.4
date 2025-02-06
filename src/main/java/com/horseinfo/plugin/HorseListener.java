@@ -30,14 +30,19 @@ public class HorseListener implements Listener {
     private final NamespacedKey tamedTimeKey;
 
     public HorseListener() {
-        this.tamedTimeKey = new NamespacedKey(
-                Bukkit.getPluginManager().getPlugin("HorseInfoPlugin"),
-                "tamedTime"
-        );
+        this.tamedTimeKey = new NamespacedKey(Bukkit.getPluginManager().getPlugin("HorseInfoPlugin"), "tamedTime");
     }
 
     private String formatDouble(double value) {
         return String.format("%.2f", value).replace('.', ',');
+    }
+
+    private double speedToMS(double attributeSpeed) {
+        return attributeSpeed * 42.17;
+    }
+
+    private double jumpToHeight(double jumpStrength) {
+        return -0.1817584952 * Math.pow(jumpStrength, 3) + 3.689713992 * Math.pow(jumpStrength, 2) + 2.128599134 * jumpStrength - 0.343930367;
     }
 
     @EventHandler
@@ -52,26 +57,16 @@ public class HorseListener implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (!(event.getRightClicked() instanceof Horse)) return;
-
         Player player = event.getPlayer();
-
         if (!player.isSneaking()) return;
-
         event.setCancelled(true);
-
         Horse horse = (Horse) event.getRightClicked();
-
         FileConfiguration config = HorseInfoPlugin.getInstance().getConfig();
-
         String guiTitle = config.getString("gui.title", "&6Info del Cavallo");
         int guiSize = config.getInt("gui.size", 27);
-
-        Inventory gui = Bukkit.createInventory(null, guiSize,
-                ChatColor.translateAlternateColorCodes('&', guiTitle));
-
+        Inventory gui = Bukkit.createInventory(null, guiSize, ChatColor.translateAlternateColorCodes('&', guiTitle));
         String horseType = horse.getType().name();
-        String horseName = (horse.getCustomName() != null) ? horse.getCustomName() : "N/D";
-
+        String horseName = (horse.getCustomName() != null) ? horse.getCustomName() : "&4&lN/D";
         String tamedDateStr = "N/D";
         PersistentDataContainer pdc = horse.getPersistentDataContainer();
         Long tamedTime = pdc.get(tamedTimeKey, PersistentDataType.LONG);
@@ -80,44 +75,33 @@ public class HorseListener implements Listener {
             Date date = new Date(tamedTime);
             tamedDateStr = df.format(date);
         }
-
         double baseSpeed = 0.0;
         try {
-            // Tentativo di recuperare l'attributo in runtime
             Attribute movementSpeed = Attribute.valueOf("GENERIC_MOVEMENT_SPEED");
             if (horse.getAttribute(movementSpeed) != null) {
                 baseSpeed = horse.getAttribute(movementSpeed).getBaseValue();
             }
-        } catch (IllegalArgumentException e) {
-            // Se la costante NON esiste in questa versione,
-            // ignora o gestisci diversamente
-        }
-
-        String horseSpeed = formatDouble(baseSpeed);
-        String horseJump = formatDouble(horse.getJumpStrength());
-
+        } catch (IllegalArgumentException e) {}
+        double speedMS = speedToMS(baseSpeed);
+        String horseSpeed = formatDouble(speedMS) + " m/s";
+        double jumpHeight = jumpToHeight(horse.getJumpStrength());
+        String horseJump = formatDouble(jumpHeight) + " m";
         double heartsValue = horse.getMaxHealth() / 2.0;
-        String horseHearts = formatDouble(heartsValue);
-
-        double scoreValue = (baseSpeed * 100.0) + (horse.getJumpStrength() * 10.0) + heartsValue;
-        String horseScore = formatDouble(scoreValue);
-
+        String horseHearts = formatDouble(heartsValue) + " cuori";
+        double scoreValue = (speedMS * 10.0) + (jumpHeight * 10.0) + heartsValue;
+        String horseScore = formatDouble(scoreValue) + " punti";
         ConfigurationSection itemsSection = config.getConfigurationSection("items");
         if (itemsSection == null) return;
-
         for (String key : itemsSection.getKeys(false)) {
             ConfigurationSection itemSection = itemsSection.getConfigurationSection(key);
             if (itemSection == null) continue;
-
             int slot = itemSection.getInt("slot");
             String materialStr = itemSection.getString("material", "BOOK");
             Material material = Material.matchMaterial(materialStr);
             if (material == null) material = Material.BOOK;
-
             String displayName = itemSection.getString("display_name", "");
             List<String> loreList = itemSection.getStringList("lore");
             List<String> finalLore = new ArrayList<>();
-
             for (String line : loreList) {
                 line = line.replace("%HORSE_TYPE%", horseType)
                         .replace("%HORSE_NAME%", horseName)
@@ -126,10 +110,8 @@ public class HorseListener implements Listener {
                         .replace("%HORSE_JUMP%", horseJump)
                         .replace("%HORSE_HEARTS%", horseHearts)
                         .replace("%HORSE_SCORE%", horseScore);
-
                 finalLore.add(ChatColor.translateAlternateColorCodes('&', line));
             }
-
             ItemStack itemStack = new ItemStack(material);
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
@@ -137,17 +119,16 @@ public class HorseListener implements Listener {
                 itemMeta.setLore(finalLore);
                 itemStack.setItemMeta(itemMeta);
             }
-
-            gui.setItem(slot, itemStack);
+            if (slot >= 0 && slot < gui.getSize()) {
+                gui.setItem(slot, itemStack);
+            }
         }
-
         player.openInventory(gui);
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        String configuredTitle = ChatColor.translateAlternateColorCodes('&',
-                HorseInfoPlugin.getInstance().getConfig().getString("gui.title", "&6Info del Cavallo"));
+        String configuredTitle = ChatColor.translateAlternateColorCodes('&', HorseInfoPlugin.getInstance().getConfig().getString("gui.title", "&6Info del Cavallo"));
         if (e.getView().getTitle().equals(configuredTitle)) {
             e.setCancelled(true);
         }
